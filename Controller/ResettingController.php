@@ -15,8 +15,14 @@ use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\Event\GetResponseNullableUserEvent;
 use FOS\UserBundle\Event\GetResponseUserEvent;
+use FOS\UserBundle\EventIdentifier\ResettingResetCompleted;
+use FOS\UserBundle\EventIdentifier\ResettingResetInitialize;
+use FOS\UserBundle\EventIdentifier\ResettingResetRequest;
+use FOS\UserBundle\EventIdentifier\ResettingResetSuccess;
+use FOS\UserBundle\EventIdentifier\ResettingSendEmailCompleted;
+use FOS\UserBundle\EventIdentifier\ResettingSendEmailConfirm;
+use FOS\UserBundle\EventIdentifier\ResettingSendEmailInitialize;
 use FOS\UserBundle\Form\Factory\FactoryInterface;
-use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Mailer\MailerInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 use FOS\UserBundle\Util\TokenGeneratorInterface;
@@ -79,16 +85,16 @@ class ResettingController extends AbstractController
 
         $user = $this->userManager->findUserByUsernameOrEmail($username);
 
-        $event = new GetResponseNullableUserEvent($user, $request);
-        $this->eventDispatcher->dispatch(FOSUserEvents::RESETTING_SEND_EMAIL_INITIALIZE, $event);
+        $event = new ResettingSendEmailInitialize($user, $request);
+        $this->eventDispatcher->dispatch($event);
 
         if (null !== $event->getResponse()) {
             return $event->getResponse();
         }
 
         if (null !== $user && !$user->isPasswordRequestNonExpired($this->retryTtl)) {
-            $event = new GetResponseUserEvent($user, $request);
-            $this->eventDispatcher->dispatch(FOSUserEvents::RESETTING_RESET_REQUEST, $event);
+            $event = new ResettingResetRequest($user, $request);
+            $this->eventDispatcher->dispatch($event);
 
             if (null !== $event->getResponse()) {
                 return $event->getResponse();
@@ -98,8 +104,8 @@ class ResettingController extends AbstractController
                 $user->setConfirmationToken($this->tokenGenerator->generateToken());
             }
 
-            $event = new GetResponseUserEvent($user, $request);
-            $this->eventDispatcher->dispatch(FOSUserEvents::RESETTING_SEND_EMAIL_CONFIRM, $event);
+            $event = new ResettingSendEmailConfirm($user, $request);
+            $this->eventDispatcher->dispatch($event);
 
             if (null !== $event->getResponse()) {
                 return $event->getResponse();
@@ -109,8 +115,8 @@ class ResettingController extends AbstractController
             $user->setPasswordRequestedAt(new \DateTime());
             $this->userManager->updateUser($user);
 
-            $event = new GetResponseUserEvent($user, $request);
-            $this->eventDispatcher->dispatch(FOSUserEvents::RESETTING_SEND_EMAIL_COMPLETED, $event);
+            $event = new ResettingSendEmailCompleted($user, $request);
+            $this->eventDispatcher->dispatch($event);
 
             if (null !== $event->getResponse()) {
                 return $event->getResponse();
@@ -154,8 +160,8 @@ class ResettingController extends AbstractController
             return new RedirectResponse($this->container->get('router')->generate('fos_user_security_login'));
         }
 
-        $event = new GetResponseUserEvent($user, $request);
-        $this->eventDispatcher->dispatch(FOSUserEvents::RESETTING_RESET_INITIALIZE, $event);
+        $event = new ResettingResetInitialize($user, $request);
+        $this->eventDispatcher->dispatch($event);
 
         if (null !== $event->getResponse()) {
             return $event->getResponse();
@@ -167,8 +173,8 @@ class ResettingController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $event = new FormEvent($form, $request);
-            $this->eventDispatcher->dispatch(FOSUserEvents::RESETTING_RESET_SUCCESS, $event);
+            $event = new ResettingResetSuccess($form, $request);
+            $this->eventDispatcher->dispatch($event);
 
             $this->userManager->updateUser($user);
 
@@ -178,8 +184,7 @@ class ResettingController extends AbstractController
             }
 
             $this->eventDispatcher->dispatch(
-                FOSUserEvents::RESETTING_RESET_COMPLETED,
-                new FilterUserResponseEvent($user, $request, $response)
+                new ResettingResetCompleted($user, $request, $response)
             );
 
             return $response;

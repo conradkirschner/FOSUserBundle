@@ -14,8 +14,10 @@ namespace FOS\UserBundle\Controller;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\Event\GetResponseUserEvent;
+use FOS\UserBundle\EventIdentifier\ChangePasswordCompleted;
+use FOS\UserBundle\EventIdentifier\ChangePasswordInitialize;
+use FOS\UserBundle\EventIdentifier\ChangePasswordSuccess;
 use FOS\UserBundle\Form\Factory\FactoryInterface;
-use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -58,8 +60,8 @@ class ChangePasswordController extends AbstractController
             throw new AccessDeniedException('This user does not have access to this section.');
         }
 
-        $event = new GetResponseUserEvent($user, $request);
-        $this->eventDispatcher->dispatch(FOSUserEvents::CHANGE_PASSWORD_INITIALIZE, $event);
+        $event = new ChangePasswordInitialize($user, $request);
+        $this->eventDispatcher->dispatch($event);
 
         if (null !== $event->getResponse()) {
             return $event->getResponse();
@@ -71,8 +73,8 @@ class ChangePasswordController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $event = new FormEvent($form, $request);
-            $this->eventDispatcher->dispatch(FOSUserEvents::CHANGE_PASSWORD_SUCCESS, $event);
+            $event = new ChangePasswordSuccess($form, $request);
+            $this->eventDispatcher->dispatch($event);
 
             $this->userManager->updateUser($user);
 
@@ -80,8 +82,8 @@ class ChangePasswordController extends AbstractController
                 $url = $this->generateUrl('fos_user_profile_show');
                 $response = new RedirectResponse($url);
             }
-
-            $this->eventDispatcher->dispatch(FOSUserEvents::CHANGE_PASSWORD_COMPLETED, new FilterUserResponseEvent($user, $request, $response));
+            $event =  new ChangePasswordCompleted($user, $request, $response);
+            $this->eventDispatcher->dispatch($event);
 
             return $response;
         }

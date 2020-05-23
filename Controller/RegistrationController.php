@@ -14,8 +14,13 @@ namespace FOS\UserBundle\Controller;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\Event\GetResponseUserEvent;
+use FOS\UserBundle\EventIdentifier\RegistrationComplete;
+use FOS\UserBundle\EventIdentifier\RegistrationConfirm;
+use FOS\UserBundle\EventIdentifier\RegistrationConfirmed;
+use FOS\UserBundle\EventIdentifier\RegistrationFailure;
+use FOS\UserBundle\EventIdentifier\RegistrationInitalize;
+use FOS\UserBundle\EventIdentifier\RegistrationSuccess;
 use FOS\UserBundle\Form\Factory\FactoryInterface;
-use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -58,8 +63,8 @@ class RegistrationController extends AbstractController
         $user = $this->userManager->createUser();
         $user->setEnabled(true);
 
-        $event = new GetResponseUserEvent($user, $request);
-        $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_INITIALIZE, $event);
+        $event = new RegistrationInitalize($user, $request);
+        $this->eventDispatcher->dispatch($event);
 
         if (null !== $event->getResponse()) {
             return $event->getResponse();
@@ -72,8 +77,8 @@ class RegistrationController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                $event = new FormEvent($form, $request);
-                $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_SUCCESS, $event);
+                $event = new RegistrationSuccess($form, $request);
+                $this->eventDispatcher->dispatch($event);
 
                 $this->userManager->updateUser($user);
 
@@ -82,13 +87,13 @@ class RegistrationController extends AbstractController
                     $response = new RedirectResponse($url);
                 }
 
-                $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_COMPLETED, new FilterUserResponseEvent($user, $request, $response));
+                $this->eventDispatcher->dispatch(new RegistrationComplete($user, $request, $response));
 
                 return $response;
             }
 
-            $event = new FormEvent($form, $request);
-            $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_FAILURE, $event);
+            $event = new RegistrationFailure($form, $request);
+            $this->eventDispatcher->dispatch($event);
 
             if (null !== $response = $event->getResponse()) {
                 return $response;
@@ -143,8 +148,8 @@ class RegistrationController extends AbstractController
         $user->setConfirmationToken(null);
         $user->setEnabled(true);
 
-        $event = new GetResponseUserEvent($user, $request);
-        $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_CONFIRM, $event);
+        $event = new RegistrationConfirm($user, $request);
+        $this->eventDispatcher->dispatch($event);
 
         $userManager->updateUser($user);
 
@@ -153,7 +158,7 @@ class RegistrationController extends AbstractController
             $response = new RedirectResponse($url);
         }
 
-        $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_CONFIRMED, new FilterUserResponseEvent($user, $request, $response));
+        $this->eventDispatcher->dispatch(new RegistrationConfirmed($user, $request, $response));
 
         return $response;
     }

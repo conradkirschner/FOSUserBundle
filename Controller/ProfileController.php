@@ -11,11 +11,11 @@
 
 namespace FOS\UserBundle\Controller;
 
-use FOS\UserBundle\Event\FilterUserResponseEvent;
-use FOS\UserBundle\Event\FormEvent;
-use FOS\UserBundle\Event\GetResponseUserEvent;
+
+use FOS\UserBundle\EventIdentifier\ProfileEditCompleted;
+use FOS\UserBundle\EventIdentifier\ProfileEditInitialize;
+use FOS\UserBundle\EventIdentifier\ProfileEditSuccess;
 use FOS\UserBundle\Form\Factory\FactoryInterface;
-use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -72,8 +72,8 @@ class ProfileController extends AbstractController
             throw new AccessDeniedException('This user does not have access to this section.');
         }
 
-        $event = new GetResponseUserEvent($user, $request);
-        $this->eventDispatcher->dispatch(FOSUserEvents::PROFILE_EDIT_INITIALIZE, $event);
+        $event = new ProfileEditInitialize($user, $request);
+        $this->eventDispatcher->dispatch($event);
 
         if (null !== $event->getResponse()) {
             return $event->getResponse();
@@ -85,8 +85,8 @@ class ProfileController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $event = new FormEvent($form, $request);
-            $this->eventDispatcher->dispatch(FOSUserEvents::PROFILE_EDIT_SUCCESS, $event);
+            $event = new ProfileEditSuccess($form, $request);
+            $this->eventDispatcher->dispatch($event);
 
             $this->userManager->updateUser($user);
 
@@ -95,7 +95,7 @@ class ProfileController extends AbstractController
                 $response = new RedirectResponse($url);
             }
 
-            $this->eventDispatcher->dispatch(FOSUserEvents::PROFILE_EDIT_COMPLETED, new FilterUserResponseEvent($user, $request, $response));
+            $this->eventDispatcher->dispatch(new ProfileEditCompleted($user, $request, $response));
 
             return $response;
         }

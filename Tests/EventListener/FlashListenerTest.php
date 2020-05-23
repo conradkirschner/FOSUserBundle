@@ -11,8 +11,8 @@
 
 namespace FOS\UserBundle\Tests\EventListener;
 
+use FOS\UserBundle\EventIdentifier\ChangePasswordCompleted;
 use FOS\UserBundle\EventListener\FlashListener;
-use FOS\UserBundle\FOSUserEvents;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -43,6 +43,6 @@ class FlashListenerTest extends TestCase
 
     public function testAddSuccessFlash()
     {
-        $this->listener->addSuccessFlash($this->event, FOSUserEvents::CHANGE_PASSWORD_COMPLETED);
+        $this->listener->addSuccessFlash($this->event, ChangePasswordCompleted::class);
     }
 }

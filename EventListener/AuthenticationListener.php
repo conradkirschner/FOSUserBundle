@@ -13,7 +13,10 @@ namespace FOS\UserBundle\EventListener;
 
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\UserEvent;
-use FOS\UserBundle\FOSUserEvents;
+use FOS\UserBundle\EventIdentifier\RegistrationComplete;
+use FOS\UserBundle\EventIdentifier\RegistrationConfirmed;
+use FOS\UserBundle\EventIdentifier\ResettingResetCompleted;
+use FOS\UserBundle\EventIdentifier\SecurityImplicitLogin;
 use FOS\UserBundle\Security\LoginManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -48,9 +51,9 @@ class AuthenticationListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            FOSUserEvents::REGISTRATION_COMPLETED => 'authenticate',
-            FOSUserEvents::REGISTRATION_CONFIRMED => 'authenticate',
-            FOSUserEvents::RESETTING_RESET_COMPLETED => 'authenticate',
+            RegistrationComplete::class => 'authenticate',
+            RegistrationConfirmed::class => 'authenticate',
+            ResettingResetCompleted::class=> 'authenticate',
         ];
     }
 
@@ -62,7 +65,7 @@ class AuthenticationListener implements EventSubscriberInterface
         try {
             $this->loginManager->logInUser($this->firewallName, $event->getUser(), $event->getResponse());
 
-            $eventDispatcher->dispatch(FOSUserEvents::SECURITY_IMPLICIT_LOGIN, new UserEvent($event->getUser(), $event->getRequest()));
+            $eventDispatcher->dispatch(new SecurityImplicitLogin($event->getUser(), $event->getRequest()));
         } catch (AccountStatusException $ex) {
             // We simply do not authenticate users which do not pass the user
             // checker (not enabled, expired, etc.).

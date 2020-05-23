@@ -11,7 +11,12 @@
 
 namespace FOS\UserBundle\Tests\Util;
 
-use FOS\UserBundle\FOSUserEvents;
+use FOS\UserBundle\EventIdentifier\UserActivated;
+use FOS\UserBundle\EventIdentifier\UserCreated;
+use FOS\UserBundle\EventIdentifier\UserDeactivated;
+use FOS\UserBundle\EventIdentifier\UserDemoted;
+use FOS\UserBundle\EventIdentifier\UserPasswordChanged;
+use FOS\UserBundle\EventIdentifier\UserPromoted;
 use FOS\UserBundle\Tests\TestUser;
 use FOS\UserBundle\Util\UserManipulator;
 use PHPUnit\Framework\TestCase;
@@ -38,7 +43,7 @@ class UserManipulatorTest extends TestCase
             ->will($this->returnValue($user))
             ->with($this->isInstanceOf('FOS\UserBundle\Tests\TestUser'));
 
-        $eventDispatcherMock = $this->getEventDispatcherMock(FOSUserEvents::USER_CREATED, true);
+        $eventDispatcherMock = $this->getEventDispatcherMock(UserCreated::class, true);
 
         $requestStackMock = $this->getRequestStackMock(true);
 
@@ -71,7 +76,7 @@ class UserManipulatorTest extends TestCase
             ->will($this->returnValue($user))
             ->with($this->isInstanceOf('FOS\UserBundle\Tests\TestUser'));
 
-        $eventDispatcherMock = $this->getEventDispatcherMock(FOSUserEvents::USER_ACTIVATED, true);
+        $eventDispatcherMock = $this->getEventDispatcherMock(UserActivated::class, true);
 
         $requestStackMock = $this->getRequestStackMock(true);
 
@@ -98,7 +103,7 @@ class UserManipulatorTest extends TestCase
         $userManagerMock->expects($this->never())
             ->method('updateUser');
 
-        $eventDispatcherMock = $this->getEventDispatcherMock(FOSUserEvents::USER_ACTIVATED, false);
+        $eventDispatcherMock = $this->getEventDispatcherMock(UserActivated::class, false);
 
         $requestStackMock = $this->getRequestStackMock(false);
 
@@ -125,7 +130,7 @@ class UserManipulatorTest extends TestCase
             ->will($this->returnValue($user))
             ->with($this->isInstanceOf('FOS\UserBundle\Tests\TestUser'));
 
-        $eventDispatcherMock = $this->getEventDispatcherMock(FOSUserEvents::USER_DEACTIVATED, true);
+        $eventDispatcherMock = $this->getEventDispatcherMock(UserDeactivated::class, true);
 
         $requestStackMock = $this->getRequestStackMock(true);
 
@@ -152,7 +157,7 @@ class UserManipulatorTest extends TestCase
         $userManagerMock->expects($this->never())
             ->method('updateUser');
 
-        $eventDispatcherMock = $this->getEventDispatcherMock(FOSUserEvents::USER_DEACTIVATED, false);
+        $eventDispatcherMock = $this->getEventDispatcherMock(UserDeactivated::class, false);
 
         $requestStackMock = $this->getRequestStackMock(false);
 
@@ -179,7 +184,7 @@ class UserManipulatorTest extends TestCase
             ->will($this->returnValue($user))
             ->with($this->isInstanceOf('FOS\UserBundle\Tests\TestUser'));
 
-        $eventDispatcherMock = $this->getEventDispatcherMock(FOSUserEvents::USER_PROMOTED, true);
+        $eventDispatcherMock = $this->getEventDispatcherMock(UserPromoted::class, true);
 
         $requestStackMock = $this->getRequestStackMock(true);
 
@@ -206,7 +211,7 @@ class UserManipulatorTest extends TestCase
         $userManagerMock->expects($this->never())
             ->method('updateUser');
 
-        $eventDispatcherMock = $this->getEventDispatcherMock(FOSUserEvents::USER_PROMOTED, false);
+        $eventDispatcherMock = $this->getEventDispatcherMock(UserPromoted::class, false);
 
         $requestStackMock = $this->getRequestStackMock(false);
 
@@ -233,7 +238,7 @@ class UserManipulatorTest extends TestCase
             ->will($this->returnValue($user))
             ->with($this->isInstanceOf('FOS\UserBundle\Tests\TestUser'));
 
-        $eventDispatcherMock = $this->getEventDispatcherMock(FOSUserEvents::USER_DEMOTED, true);
+        $eventDispatcherMock = $this->getEventDispatcherMock(UserDemoted::class, true);
 
         $requestStackMock = $this->getRequestStackMock(true);
 
@@ -260,7 +265,7 @@ class UserManipulatorTest extends TestCase
         $userManagerMock->expects($this->never())
             ->method('updateUser');
 
-        $eventDispatcherMock = $this->getEventDispatcherMock(FOSUserEvents::USER_DEMOTED, false);
+        $eventDispatcherMock = $this->getEventDispatcherMock(UserDemoted::class, false);
 
         $requestStackMock = $this->getRequestStackMock(false);
 
@@ -290,7 +295,7 @@ class UserManipulatorTest extends TestCase
             ->will($this->returnValue($user))
             ->with($this->isInstanceOf('FOS\UserBundle\Tests\TestUser'));
 
-        $eventDispatcherMock = $this->getEventDispatcherMock(FOSUserEvents::USER_PASSWORD_CHANGED, true);
+        $eventDispatcherMock = $this->getEventDispatcherMock(UserPasswordChanged::class, true);
 
         $requestStackMock = $this->getRequestStackMock(true);
 
@@ -319,7 +324,7 @@ class UserManipulatorTest extends TestCase
         $userManagerMock->expects($this->never())
             ->method('updateUser');
 
-        $eventDispatcherMock = $this->getEventDispatcherMock(FOSUserEvents::USER_PASSWORD_CHANGED, false);
+        $eventDispatcherMock = $this->getEventDispatcherMock(UserPasswordChanged::class, false);
 
         $requestStackMock = $this->getRequestStackMock(false);
 

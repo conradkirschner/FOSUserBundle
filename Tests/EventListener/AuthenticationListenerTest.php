@@ -12,8 +12,8 @@
 namespace FOS\UserBundle\Tests\EventListener;
 
 use FOS\UserBundle\Event\FilterUserResponseEvent;
+use FOS\UserBundle\EventIdentifier\RegistrationComplete;
 use FOS\UserBundle\EventListener\AuthenticationListener;
-use FOS\UserBundle\FOSUserEvents;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -50,6 +50,6 @@ class AuthenticationListenerTest extends TestCase
 
     public function testAuthenticate()
     {
-        $this->listener->authenticate($this->event, FOSUserEvents::REGISTRATION_COMPLETED, $this->eventDispatcher);
+        $this->listener->authenticate($this->event, RegistrationComplete::class, $this->eventDispatcher);
     }
 }

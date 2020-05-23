@@ -12,7 +12,7 @@
 namespace FOS\UserBundle\EventListener;
 
 use FOS\UserBundle\Event\UserEvent;
-use FOS\UserBundle\FOSUserEvents;
+use FOS\UserBundle\EventIdentifier\SecurityImplicitLogin;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -37,7 +37,7 @@ class LastLoginListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            FOSUserEvents::SECURITY_IMPLICIT_LOGIN => 'onImplicitLogin',
+            SecurityImplicitLogin::class => 'onImplicitLogin',
             SecurityEvents::INTERACTIVE_LOGIN => 'onSecurityInteractiveLogin',
         ];
     }

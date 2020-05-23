@@ -11,10 +11,16 @@
 
 namespace FOS\UserBundle\Event;
 
+use FOS\UserBundle\Model\UserInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class GetResponseUserEvent extends UserEvent
 {
+    public function __construct(UserInterface $user, Request $request = null)
+    {
+        parent::__construct($user, $request);
+    }
     /**
      * @var Response
      */

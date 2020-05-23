@@ -12,7 +12,12 @@
 namespace FOS\UserBundle\Util;
 
 use FOS\UserBundle\Event\UserEvent;
-use FOS\UserBundle\FOSUserEvents;
+use FOS\UserBundle\EventIdentifier\UserActivated;
+use FOS\UserBundle\EventIdentifier\UserCreated;
+use FOS\UserBundle\EventIdentifier\UserDeactivated;
+use FOS\UserBundle\EventIdentifier\UserDemoted;
+use FOS\UserBundle\EventIdentifier\UserPasswordChanged;
+use FOS\UserBundle\EventIdentifier\UserPromoted;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -74,8 +79,8 @@ class UserManipulator
         $user->setSuperAdmin((bool) $superadmin);
         $this->userManager->updateUser($user);
 
-        $event = new UserEvent($user, $this->getRequest());
-        $this->dispatcher->dispatch(FOSUserEvents::USER_CREATED, $event);
+        $event = new UserCreated($user, $this->getRequest());
+        $this->dispatcher->dispatch($event);
 
         return $user;
     }
@@ -91,8 +96,8 @@ class UserManipulator
         $user->setEnabled(true);
         $this->userManager->updateUser($user);
 
-        $event = new UserEvent($user, $this->getRequest());
-        $this->dispatcher->dispatch(FOSUserEvents::USER_ACTIVATED, $event);
+        $event = new UserActivated($user, $this->getRequest());
+        $this->dispatcher->dispatch($event);
     }
 
     /**
@@ -106,8 +111,8 @@ class UserManipulator
         $user->setEnabled(false);
         $this->userManager->updateUser($user);
 
-        $event = new UserEvent($user, $this->getRequest());
-        $this->dispatcher->dispatch(FOSUserEvents::USER_DEACTIVATED, $event);
+        $event = new UserDeactivated($user, $this->getRequest());
+        $this->dispatcher->dispatch($event);
     }
 
     /**
@@ -122,8 +127,8 @@ class UserManipulator
         $user->setPlainPassword($password);
         $this->userManager->updateUser($user);
 
-        $event = new UserEvent($user, $this->getRequest());
-        $this->dispatcher->dispatch(FOSUserEvents::USER_PASSWORD_CHANGED, $event);
+        $event = new UserPasswordChanged($user, $this->getRequest());
+        $this->dispatcher->dispatch($event);
     }
 
     /**
@@ -137,8 +142,8 @@ class UserManipulator
         $user->setSuperAdmin(true);
         $this->userManager->updateUser($user);
 
-        $event = new UserEvent($user, $this->getRequest());
-        $this->dispatcher->dispatch(FOSUserEvents::USER_PROMOTED, $event);
+        $event = new UserPromoted($user, $this->getRequest());
+        $this->dispatcher->dispatch($event);
     }
 
     /**
@@ -152,8 +157,8 @@ class UserManipulator
         $user->setSuperAdmin(false);
         $this->userManager->updateUser($user);
 
-        $event = new UserEvent($user, $this->getRequest());
-        $this->dispatcher->dispatch(FOSUserEvents::USER_DEMOTED, $event);
+        $event = new UserDemoted($user, $this->getRequest());
+        $this->dispatcher->dispatch($event);
     }
 
     /**

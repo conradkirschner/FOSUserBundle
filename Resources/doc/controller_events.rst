@@ -7,8 +7,7 @@ that you need to extend that functionality and add some logic that suits the
 specific needs of your application.
 
 For this purpose, the controllers are dispatching events in many places in
-their logic. All events can be found in the constants of the
-``FOS\UserBundle\FOSUserEvents`` class.
+their logic. All events can be found in the EventIdentifier Folder.
 
 All controllers follow the same convention: they dispatch a ``SUCCESS`` event
 when the form is valid before saving the user, and a ``COMPLETED`` event when
@@ -26,7 +25,6 @@ resetting to go to the homepage instead of the profile::
 
     namespace Acme\UserBundle\EventListener;
 
-    use FOS\UserBundle\FOSUserEvents;
     use FOS\UserBundle\Event\FormEvent;
     use Symfony\Component\EventDispatcher\EventSubscriberInterface;
     use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -50,7 +48,7 @@ resetting to go to the homepage instead of the profile::
         public static function getSubscribedEvents()
         {
             return array(
-                FOSUserEvents::RESETTING_RESET_SUCCESS => 'onPasswordResettingSuccess',
+               ResettingResetSuccess::class => 'onPasswordResettingSuccess',
             );
         }
 

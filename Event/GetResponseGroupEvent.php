@@ -11,10 +11,17 @@
 
 namespace FOS\UserBundle\Event;
 
+use FOS\UserBundle\Model\GroupInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class GetResponseGroupEvent extends GroupEvent
 {
+
+    public function __construct(GroupInterface $group, Request $request)
+    {
+        parent::__construct($group, $request);
+    }
     /**
      * @var Response
      */

@@ -11,7 +11,13 @@
 
 namespace FOS\UserBundle\EventListener;
 
-use FOS\UserBundle\FOSUserEvents;
+use FOS\UserBundle\EventIdentifier\ChangePasswordCompleted;
+use FOS\UserBundle\EventIdentifier\GroupCreateCompleted;
+use FOS\UserBundle\EventIdentifier\GroupDeleteCompleted;
+use FOS\UserBundle\EventIdentifier\GroupEditCompleted;
+use FOS\UserBundle\EventIdentifier\ProfileEditCompleted;
+use FOS\UserBundle\EventIdentifier\RegistrationComplete;
+use FOS\UserBundle\EventIdentifier\ResettingResetCompleted;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -24,13 +30,13 @@ class FlashListener implements EventSubscriberInterface
      * @var string[]
      */
     private static $successMessages = [
-        FOSUserEvents::CHANGE_PASSWORD_COMPLETED => 'change_password.flash.success',
-        FOSUserEvents::GROUP_CREATE_COMPLETED => 'group.flash.created',
-        FOSUserEvents::GROUP_DELETE_COMPLETED => 'group.flash.deleted',
-        FOSUserEvents::GROUP_EDIT_COMPLETED => 'group.flash.updated',
-        FOSUserEvents::PROFILE_EDIT_COMPLETED => 'profile.flash.updated',
-        FOSUserEvents::REGISTRATION_COMPLETED => 'registration.flash.user_created',
-        FOSUserEvents::RESETTING_RESET_COMPLETED => 'resetting.flash.success',
+        ChangePasswordCompleted::class => 'change_password.flash.success',
+        GroupCreateCompleted::class => 'group.flash.created',
+        GroupDeleteCompleted::class => 'group.flash.deleted',
+        GroupEditCompleted::class => 'group.flash.updated',
+        ProfileEditCompleted::class => 'profile.flash.updated',
+        RegistrationComplete::class => 'registration.flash.user_created',
+        ResettingResetCompleted::class => 'resetting.flash.success',
     ];
 
     /**
@@ -58,13 +64,13 @@ class FlashListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            FOSUserEvents::CHANGE_PASSWORD_COMPLETED => 'addSuccessFlash',
-            FOSUserEvents::GROUP_CREATE_COMPLETED => 'addSuccessFlash',
-            FOSUserEvents::GROUP_DELETE_COMPLETED => 'addSuccessFlash',
-            FOSUserEvents::GROUP_EDIT_COMPLETED => 'addSuccessFlash',
-            FOSUserEvents::PROFILE_EDIT_COMPLETED => 'addSuccessFlash',
-            FOSUserEvents::REGISTRATION_COMPLETED => 'addSuccessFlash',
-            FOSUserEvents::RESETTING_RESET_COMPLETED => 'addSuccessFlash',
+            ChangePasswordCompleted::class => 'addSuccessFlash',
+            GroupCreateCompleted::class => 'addSuccessFlash',
+            GroupDeleteCompleted::class => 'addSuccessFlash',
+            GroupEditCompleted::class => 'addSuccessFlash',
+            ProfileEditCompleted::class => 'addSuccessFlash',
+            RegistrationComplete::class => 'addSuccessFlash',
+            ResettingResetCompleted::class => 'addSuccessFlash',
         ];
     }
 

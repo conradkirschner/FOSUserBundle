@@ -11,12 +11,14 @@
 
 namespace FOS\UserBundle\Controller;
 
-use FOS\UserBundle\Event\FilterGroupResponseEvent;
-use FOS\UserBundle\Event\FormEvent;
-use FOS\UserBundle\Event\GetResponseGroupEvent;
-use FOS\UserBundle\Event\GroupEvent;
+
+use FOS\UserBundle\EventIdentifier\GroupCreateCompleted;
+use FOS\UserBundle\EventIdentifier\GroupCreateInitialize;
+use FOS\UserBundle\EventIdentifier\GroupDeleteCompleted;
+use FOS\UserBundle\EventIdentifier\GroupEditCompleted;
+use FOS\UserBundle\EventIdentifier\GroupEditInitalize;
+use FOS\UserBundle\EventIdentifier\GroupEditSuccess;
 use FOS\UserBundle\Form\Factory\FactoryInterface;
-use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\GroupInterface;
 use FOS\UserBundle\Model\GroupManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -82,8 +84,8 @@ class GroupController extends AbstractController
     {
         $group = $this->findGroupBy('name', $groupName);
 
-        $event = new GetResponseGroupEvent($group, $request);
-        $this->eventDispatcher->dispatch(FOSUserEvents::GROUP_EDIT_INITIALIZE, $event);
+        $event = new GroupEditInitalize($group, $request);
+        $this->eventDispatcher->dispatch($event);
 
         if (null !== $event->getResponse()) {
             return $event->getResponse();
@@ -95,8 +97,8 @@ class GroupController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $event = new FormEvent($form, $request);
-            $this->eventDispatcher->dispatch(FOSUserEvents::GROUP_EDIT_SUCCESS, $event);
+            $event = new GroupEditSuccess($form, $request);
+            $this->eventDispatcher->dispatch($event);
 
             $this->groupManager->updateGroup($group);
 
@@ -105,7 +107,7 @@ class GroupController extends AbstractController
                 $response = new RedirectResponse($url);
             }
 
-            $this->eventDispatcher->dispatch(FOSUserEvents::GROUP_EDIT_COMPLETED, new FilterGroupResponseEvent($group, $request, $response));
+            $this->eventDispatcher->dispatch(new GroupEditCompleted($group, $request, $response));
 
             return $response;
         }
@@ -125,7 +127,7 @@ class GroupController extends AbstractController
     {
         $group = $this->groupManager->createGroup('');
 
-        $this->eventDispatcher->dispatch(FOSUserEvents::GROUP_CREATE_INITIALIZE, new GroupEvent($group, $request));
+        $this->eventDispatcher->dispatch(new GroupCreateInitialize($group, $request));
 
         $form = $this->formFactory->createForm();
         $form->setData($group);
@@ -133,8 +135,8 @@ class GroupController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $event = new FormEvent($form, $request);
-            $this->eventDispatcher->dispatch(FOSUserEvents::GROUP_CREATE_SUCCESS, $event);
+            $event = new GroupCreateSuccess($form, $request);
+            $this->eventDispatcher->dispatch($event);
 
             $this->groupManager->updateGroup($group);
 
@@ -143,7 +145,7 @@ class GroupController extends AbstractController
                 $response = new RedirectResponse($url);
             }
 
-            $this->eventDispatcher->dispatch(FOSUserEvents::GROUP_CREATE_COMPLETED, new FilterGroupResponseEvent($group, $request, $response));
+            $this->eventDispatcher->dispatch(new GroupCreateCompleted($group, $request, $response));
 
             return $response;
         }
@@ -167,7 +169,7 @@ class GroupController extends AbstractController
 
         $response = new RedirectResponse($this->generateUrl('fos_user_group_list'));
 
-        $this->eventDispatcher->dispatch(FOSUserEvents::GROUP_DELETE_COMPLETED, new FilterGroupResponseEvent($group, $request, $response));
+        $this->eventDispatcher->dispatch(new GroupDeleteCompleted($group, $request, $response));
 
         return $response;
     }
